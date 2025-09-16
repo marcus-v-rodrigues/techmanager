@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: techmanager
+spec:
+  selector:
+    app: techmanager
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: techmanager
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: techmanager
+  template:
+    metadata:
+      labels:
+        app: techmanager
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/marcus-v-rodrigues/techmanager:prod
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: techmanager-env
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: techmanager-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: techmanager
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
