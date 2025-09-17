@@ -128,11 +128,36 @@ kubectl port-forward svc/techmanager 8080:80
 curl -s http://localhost:8080/actuator/health
 ```
 
+## Health Probes (K8s)
+
+* Readiness: `/actuator/health/readiness`
+* Liveness: `/actuator/health/liveness`
+
 ---
 
 ## API Endpoints
 
+All endpoints are available under the `/api/users` path.
+
 ### Create User
+
+Creates a new user. The request body must contain the user's data. On success, it returns `201 Created` with the newly created user object, including its generated `id`.
+
+* **Endpoint:** `POST /api/users`
+* **Headers:** `Content-Type: application/json`
+* **Body:**
+
+```json
+{
+  "fullName": "Ana Silva",
+  "email": "ana@example.com",
+  "phone": "+55 11 99999-9999",
+  "birthDate": "1990-01-01",
+  "userType": "ADMIN"
+}
+```
+
+**Example:**
 
 ```bash
 curl -X POST http://localhost:8080/api/users \
@@ -148,42 +173,68 @@ curl -X POST http://localhost:8080/api/users \
 
 ### List Users
 
+Retrieves a list of all registered users.
+
+  * **Endpoint:** `GET /api/users`
+  * **Example:**
+
 ```bash
 curl http://localhost:8080/api/users
 ```
 
 ### Get by ID
 
+Retrieves a single user by their unique ID. If the ID is not found, it returns a `404 Not Found` error.
+
+  * **Endpoint:** `GET /api/users/{id}`
+  * **Example:**
+
 ```bash
 curl http://localhost:8080/api/users/1
 ```
 
-### Update
+### Update User
+
+Updates the data of an existing user identified by their ID. The request body must contain the new data for the user.
+
+  * **Endpoint:** `PUT /api/users/{id}`
+  * **Headers:** `Content-Type: application/json`
+  * **Body:**
+
+```json
+{
+  "fullName": "Ana Maria Silva",
+  "email": "ana.maria@example.com",
+  "phone": "+55 11 98888-8888",
+  "birthDate": "1990-01-01",
+  "userType": "EDITOR"
+}
+```
+
+**Example:**
 
 ```bash
 curl -X PUT http://localhost:8080/api/users/1 \
   -H "Content-Type: application/json" \
   -d '{
     "fullName":"Ana Maria Silva",
-    "email":"ana@example.com",
-    "phone":"+55 11 99999-9999",
+    "email":"ana.maria@example.com",
+    "phone":"+55 11 98888-8888",
     "birthDate":"1990-01-01",
-    "userType":"ADMIN"
+    "userType":"EDITOR"
   }'
 ```
 
-### Delete
+### Delete User
+
+Deletes a user by their unique ID. On success, it returns `204 No Content`. If the ID is not found, it returns a `404 Not Found` error.
+
+  * **Endpoint:** `DELETE /api/users/{id}`
+  * **Example:**
 
 ```bash
 curl -X DELETE http://localhost:8080/api/users/1
 ```
-
----
-
-## Health Probes (K8s)
-
-* Readiness: `/actuator/health/readiness`
-* Liveness: `/actuator/health/liveness`
 
 ---
 
