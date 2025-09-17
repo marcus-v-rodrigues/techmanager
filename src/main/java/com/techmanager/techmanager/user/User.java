@@ -29,6 +29,6 @@ public class User {
   private LocalDate birthDate;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "user_type", nullable = false)
+  @Column(name = "user_type", nullable = false, length = 16)
   private UserType userType;
 }
